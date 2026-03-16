@@ -11,6 +11,7 @@ import type {
   SessionDialogDetail,
 } from "@/type/Consultations";
 import type { EmotionalQuery, EmotionalResponse } from "@/type/Emotional";
+import type { AnalyticsOverviewResponse } from "@/type/DashBoard";
 
 export function login(data: {
   username: string;
@@ -135,4 +136,9 @@ export function deleteEmotional(id: string): Promise<{
   message: string;
 }> {
   return service.delete(`/emotion-diary/admin/${id}`);
+}
+
+//数据分析
+export function getAnalyticsOverview(): Promise<AnalyticsOverviewResponse> {
+  return service.get("/data-analytics/overview");
 }

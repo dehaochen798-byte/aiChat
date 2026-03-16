@@ -136,6 +136,7 @@ const handleChange = (page: string) => {
 const handleSearch = () => {
   getConsultationPage(pagination).then((res) => {
     const { total, records } = res;
+    // console.log(res, "总条数");
     pagination.total = total;
     tableData.value = records;
   });
