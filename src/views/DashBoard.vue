@@ -1,13 +1,85 @@
 <template>
   <div class="dashboard-container">
-    <el-row :gutter="20">
-      <el-col span="6">
+    <el-row :gutter="24">
+      <el-col :span="6" v-if="aiDate?.systemOverview">
         <el-card>
           <div class="card-content">
             <div class="avatar users">
-              <el-image :src="iconUrl1"></el-image>
+              <el-image
+                :src="iconUrl1"
+                style="width: 40px; height: 40px"
+              ></el-image>
             </div>
-            <div class="info">{{}}</div>
+            <div class="info">
+              <p class="title">总用户数</p>
+              <p class="value">
+                {{ aiDate?.systemOverview?.totalUsers || 0 }}
+              </p>
+              <p class="subtitle-title">
+                活跃用户：{{ aiDate?.systemOverview?.activeUsers }}
+              </p>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+      <el-col :span="6" v-if="aiDate?.systemOverview">
+        <el-card>
+          <div class="card-content">
+            <div class="avatar like">
+              <el-image
+                :src="iconUrl2"
+                style="width: 40px; height: 40px"
+              ></el-image>
+            </div>
+            <div class="info">
+              <p class="title">情绪日志</p>
+              <p class="value">
+                {{ aiDate?.systemOverview?.totalDiaries || 0 }}
+              </p>
+              <p class="subtitle-title">
+                今日新增：{{ aiDate?.systemOverview?.todayNewDiaries || 0 }}
+              </p>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+      <el-col :span="6" v-if="aiDate?.systemOverview">
+        <el-card>
+          <div class="card-content">
+            <div class="avatar comments">
+              <el-image
+                :src="iconUrl3"
+                style="width: 40px; height: 40px"
+              ></el-image>
+            </div>
+            <div class="info">
+              <p class="title">咨询会话</p>
+              <p class="value">
+                {{ aiDate?.systemOverview?.totalSessions || 0 }}
+              </p>
+              <p class="subtitle-title">
+                今日新增：{{ aiDate?.systemOverview?.todayNewSessions || 0 }}
+              </p>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+      <el-col :span="6" v-if="aiDate?.systemOverview">
+        <el-card>
+          <div class="card-content">
+            <div class="avatar smile">
+              <el-image
+                :src="iconUrl4"
+                style="width: 40px; height: 40px"
+              ></el-image>
+            </div>
+            <div class="info">
+              <p class="title">平均情绪</p>
+              <p class="value">
+                {{ aiDate?.systemOverview?.avgMoodScore || 0 }}/10
+              </p>
+              <p class="subtitle-title">情绪健康指数</p>
+            </div>
           </div>
         </el-card>
       </el-col>
