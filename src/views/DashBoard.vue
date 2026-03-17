@@ -86,7 +86,7 @@
     </el-row>
     <el-row :gutter="20" style="margin-top: 20px">
       <el-col :span="12">
-        <el-card style="height: 100%">
+        <el-card style="width: 100%">
           <template #header>
             <div class="card-header">情绪趋势分析</div>
           </template>
@@ -95,7 +95,39 @@
           </div>
         </el-card>
       </el-col>
-      <el-col :span="12"></el-col>
+      <el-col :span="12">
+        <el-card style="width: 100%">
+          <template #header>
+            <div class="card-header">咨询会话统计</div>
+          </template>
+          <div class="chart-content">
+            <div class="consultation-stats">
+              <div class="stat-item">
+                <div class="stat-label">总会话数</div>
+                <div class="stat-value">
+                  {{ aiDate?.consultationStats?.totalSessions || 0 }}
+                </div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-label">平均时长</div>
+                <div class="stat-value">
+                  {{ aiDate?.consultationStats?.avgDurationMinutes || 0 }}
+                </div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-label">活跃用户</div>
+                <div class="stat-value">
+                  {{ aiDate?.systemOverview?.activeUsers || 0 }}
+                </div>
+              </div>
+            </div>
+            <div
+              ref="consultationChartRef"
+              style="height: 260px; width: 100%"
+            ></div>
+          </div>
+        </el-card>
+      </el-col>
     </el-row>
   </div>
 </template>
@@ -111,17 +143,17 @@ const iconUrl2 = new URL("@/assets/images/like.png", import.meta.url).href;
 const iconUrl3 = new URL("@/assets/images/comments.png", import.meta.url).href;
 const iconUrl4 = new URL("@/assets/images/smile.png", import.meta.url).href;
 
-// 图表实例
-let emotionChart: echarts.ECharts | null = null;
-const emotionChartRef = ref<HTMLDivElement | null>(null);
-
 const aiDate = ref<AnalyticsOverviewResponse | null>(null);
 
 //初始化图表
 const initChart = () => {
   initEmotionChart();
+  initConsultationChart();
 };
 
+// 初始化情绪图表
+let emotionChart: echarts.ECharts | null = null;
+const emotionChartRef = ref<HTMLDivElement | null>(null);
 const initEmotionChart = () => {
   if (!emotionChartRef.value) return;
   //销毁现有的图表
@@ -182,7 +214,7 @@ const initEmotionChart = () => {
         position: "left",
         axisLine: {
           lineStyle: {
-            color: "#2d3436",
+            color: "#d6e372",
           },
         },
       },
@@ -192,7 +224,7 @@ const initEmotionChart = () => {
         position: "right",
         axisLine: {
           lineStyle: {
-            color: "#2d3436",
+            color: "#d6e372",
           },
         },
       },
@@ -228,6 +260,131 @@ const initEmotionChart = () => {
   };
 
   emotionChart.setOption(option);
+};
+
+// 初始化会话统计图表
+let consultationChart: echarts.ECharts | null = null;
+const consultationChartRef = ref<HTMLDivElement | null>(null);
+
+const initConsultationChart = () => {
+  if (!consultationChartRef.value) return;
+
+  //销毁现有的图表
+  if (consultationChart) {
+    consultationChart.dispose();
+    consultationChart = null;
+  }
+
+  //创建Echarts实例
+  consultationChart = echarts.init(consultationChartRef.value);
+  //获取会话统计数据
+  const dailyTrend = aiDate.value?.consultationStats.dailyTrend || [];
+
+  const option = {
+    title: {
+      text: "咨询活动统计",
+      textStyle: {
+        fontSize: 16,
+        fontWeight: 600,
+        color: "#2d3436",
+      },
+      left: "center",
+      top: 10,
+    },
+    tooltip: {
+      trigger: "axis",
+      backgroundColor: "rgba(255, 255, 255, 0.95)",
+      borderColor: "#fab1a0",
+      borderWidth: 1,
+      textStyle: {
+        color: "#2d3436",
+      },
+    },
+    legend: {
+      data: ["会话数量", "参与用户数"],
+      top: 40,
+      textStyle: {
+        color: "#636e72",
+      },
+    },
+    grid: {
+      left: "3%",
+      right: "4%",
+      bottom: "3%",
+      top: 80,
+      containLabel: true,
+    },
+    xAxis: {
+      type: "category",
+      data: dailyTrend.map((item) => item.date),
+      axisLine: {
+        lineStyle: {
+          color: "rgba(244, 162, 97, 0.3)",
+        },
+      },
+      axisLabel: {
+        color: "#636e72",
+      },
+    },
+    yAxis: {
+      type: "value",
+      axisLabel: {
+        color: "#636e72",
+      },
+      axisLine: {
+        lineStyle: {
+          color: "rgba(244, 162, 97, 0.3)",
+        },
+      },
+      splitLine: {
+        lineStyle: {
+          color: "rgba(244, 162, 97, 0.1)",
+        },
+      },
+    },
+    series: [
+      {
+        name: "会话数量",
+        type: "bar",
+        data: dailyTrend.map((item) => item.sessionCount),
+        itemStyle: {
+          color: {
+            type: "linear",
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [
+              { offset: 0, color: "#74b9ff" },
+              { offset: 1, color: "#0984e3" },
+            ],
+          },
+        },
+        barWidth: "40%",
+      },
+      {
+        name: "参与用户数",
+        type: "bar",
+        data: dailyTrend.map((item) => item.userCount),
+        itemStyle: {
+          color: {
+            type: "linear",
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [
+              { offset: 0, color: "#fdcb6e" },
+              { offset: 1, color: "#f39c12" },
+            ],
+          },
+        },
+        barWidth: "40%",
+      },
+    ],
+  };
+  //设置会话统计图表选项
+  consultationChart.setOption(option);
 };
 
 onMounted(() => {
