@@ -552,7 +552,7 @@ const initUserActivityChart = () => {
 
 onMounted(() => {
   getAnalyticsOverview().then((res) => {
-    console.log(res, "数据分析");
+    // console.log(res, "数据分析");
     aiDate.value = res;
     initChart();
   });

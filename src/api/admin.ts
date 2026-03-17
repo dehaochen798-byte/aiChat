@@ -142,3 +142,7 @@ export function deleteEmotional(id: string): Promise<{
 export function getAnalyticsOverview(): Promise<AnalyticsOverviewResponse> {
   return service.get("/data-analytics/overview");
 }
+
+export function logout() {
+  return service.post("/user/logout");
+}

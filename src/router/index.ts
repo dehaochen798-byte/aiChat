@@ -6,6 +6,7 @@ import AuthLayout from "@/components/AuthLayout.vue";
 const managerRouter = [
   {
     path: "/manage",
+    redirect: "/manage/dashboard",
     component: ManageLayout,
     children: [
       {
@@ -68,6 +69,29 @@ const managerRouter = [
 const router = createRouter({
   history: createWebHistory(),
   routes: managerRouter,
+});
+
+// 路由守卫
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+    if (userInfo.userType === 2) {
+      if (to.path.startsWith("/manage")) {
+        next();
+      } else {
+        next("/manage/dashboard");
+      }
+    } else if (userInfo.userType === 1) {
+      next("/auth/login");
+    }
+  } else {
+    if (to.path.startsWith("/manage")) {
+      next("/auth/login");
+    } else {
+      next();
+    }
+  }
 });
 
 export default router;
