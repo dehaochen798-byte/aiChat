@@ -129,6 +129,19 @@
         </el-card>
       </el-col>
     </el-row>
+    <el-row style="margin-top: 20px">
+      <el-card style="width: 100%">
+        <template #header>
+          <div class="card-header">用户活跃度分析</div>
+        </template>
+        <div class="chart-content">
+          <div
+            ref="userActivityChartRef"
+            style="height: 300px; width: 100%"
+          ></div>
+        </div>
+      </el-card>
+    </el-row>
   </div>
 </template>
 <script setup lang="ts">
@@ -149,6 +162,7 @@ const aiDate = ref<AnalyticsOverviewResponse | null>(null);
 const initChart = () => {
   initEmotionChart();
   initConsultationChart();
+  initUserActivityChart();
 };
 
 // 初始化情绪图表
@@ -265,7 +279,6 @@ const initEmotionChart = () => {
 // 初始化会话统计图表
 let consultationChart: echarts.ECharts | null = null;
 const consultationChartRef = ref<HTMLDivElement | null>(null);
-
 const initConsultationChart = () => {
   if (!consultationChartRef.value) return;
 
@@ -385,6 +398,156 @@ const initConsultationChart = () => {
   };
   //设置会话统计图表选项
   consultationChart.setOption(option);
+};
+
+// 初始化用户活跃度图表
+let userActivityChart: echarts.ECharts | null = null;
+const userActivityChartRef = ref<HTMLDivElement | null>(null);
+const initUserActivityChart = () => {
+  //判断是否有图表容器
+  if (!userActivityChartRef.value) return;
+  //销毁现有的图表
+  if (userActivityChart) {
+    userActivityChart.dispose();
+    userActivityChart = null;
+  }
+
+  //创建Echarts实例
+  userActivityChart = echarts.init(userActivityChartRef.value);
+  //获取用户活跃度数据
+  const activityData = aiDate.value?.userActivity || [];
+
+  const option = {
+    title: {
+      text: "用户活跃度趋势",
+      textStyle: {
+        fontSize: 16,
+        fontWeight: 600,
+        color: "#2d3436",
+      },
+      left: "center",
+      top: 10,
+    },
+    tooltip: {
+      trigger: "axis",
+      backgroundColor: "rgba(255, 255, 255, 0.95)",
+      borderColor: "#fab1a0",
+      borderWidth: 1,
+      textStyle: {
+        color: "#2d3436",
+      },
+    },
+    legend: {
+      data: ["活跃用户", "新增用户", "日记用户", "咨询用户"],
+      top: 40,
+      textStyle: {
+        color: "#636e72",
+      },
+    },
+    grid: {
+      left: "3%",
+      right: "4%",
+      bottom: "3%",
+      top: 80,
+      containLabel: true,
+    },
+    xAxis: {
+      type: "category",
+      data: activityData.map((item) => item.date),
+      axisLine: {
+        lineStyle: {
+          color: "rgba(244, 162, 97, 0.3)",
+        },
+      },
+      axisLabel: {
+        color: "#636e72",
+      },
+    },
+    yAxis: {
+      type: "value",
+      axisLabel: {
+        color: "#636e72",
+      },
+      axisLine: {
+        lineStyle: {
+          color: "rgba(244, 162, 97, 0.3)",
+        },
+      },
+      splitLine: {
+        lineStyle: {
+          color: "rgba(244, 162, 97, 0.1)",
+        },
+      },
+    },
+    series: [
+      {
+        name: "活跃用户",
+        type: "line",
+        data: activityData.map((item) => item.activeUsers),
+        smooth: true,
+        lineStyle: {
+          width: 3,
+          color: "#a29bfe",
+        },
+        itemStyle: {
+          color: "#a29bfe",
+        },
+        areaStyle: {
+          color: {
+            type: "linear",
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [
+              { offset: 0, color: "rgba(162, 155, 254, 0.4)" },
+              { offset: 1, color: "rgba(162, 155, 254, 0.1)" },
+            ],
+          },
+        },
+      },
+      {
+        name: "新增用户",
+        type: "line",
+        data: activityData.map((item) => item.newUsers),
+        smooth: true,
+        lineStyle: {
+          width: 3,
+          color: "#fdcb6e",
+        },
+        itemStyle: {
+          color: "#fdcb6e",
+        },
+      },
+      {
+        name: "日记用户",
+        type: "line",
+        data: activityData.map((item) => item.diaryUsers),
+        smooth: true,
+        lineStyle: {
+          width: 3,
+          color: "#00b894",
+        },
+        itemStyle: {
+          color: "#00b894",
+        },
+      },
+      {
+        name: "咨询用户",
+        type: "line",
+        data: activityData.map((item) => item.consultationUsers),
+        smooth: true,
+        lineStyle: {
+          width: 3,
+          color: "#fab1a0",
+        },
+        itemStyle: {
+          color: "#fab1a0",
+        },
+      },
+    ],
+  };
+  userActivityChart.setOption(option);
 };
 
 onMounted(() => {
