@@ -6,6 +6,7 @@ import App from "./App.vue";
 import router from "./router";
 import * as ElementPlusIconsVue from "@element-plus/icons-vue";
 import { createPinia } from "pinia";
+import * as echarts from "echarts";
 
 const app = createApp(App);
 const pinia = createPinia();
