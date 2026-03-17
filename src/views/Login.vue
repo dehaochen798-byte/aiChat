@@ -2,7 +2,7 @@
   <div class="container">
     <div class="title">
       <div class="back-home">
-        <el-icon><Back /></el-icon>
+        <el-icon><Back /></el-icon>回到首页
       </div>
       <div class="title-text">
         <h2>登录您的账户</h2>

@@ -1,13 +1,11 @@
 import { createRouter, createWebHistory } from "vue-router";
-import ManageLayout from "@/components/ManageLayout.vue";
-import AuthLayout from "@/components/AuthLayout.vue";
 
 //路由配置
 const managerRouter = [
   {
     path: "/manage",
     redirect: "/manage/dashboard",
-    component: ManageLayout,
+    component: () => import("@/components/ManageLayout.vue"),
     children: [
       {
         path: "dashboard",
@@ -45,7 +43,7 @@ const managerRouter = [
   },
   {
     path: "/auth",
-    component: AuthLayout,
+    component: () => import("@/components/AuthLayout.vue"),
     children: [
       {
         path: "login",
@@ -66,9 +64,47 @@ const managerRouter = [
   },
 ];
 
+//前台路由
+const frontendRouters = [
+  {
+    path: "/",
+    component: () => import("@/components/Frontend/FrontendLayout.vue"),
+    children: [
+      {
+        path: "",
+        component: () => import("@/components/Frontend/Home.vue"),
+        meta: {
+          title: "首页",
+        },
+      },
+      {
+        path: "consultations",
+        component: () => import("@/components/Frontend/Consultations.vue"),
+        meta: {
+          title: "AI咨询",
+        },
+      },
+      {
+        path: "emotion-diary",
+        component: () => import("@/components/Frontend/EmotionDiary.vue"),
+        meta: {
+          title: "情绪日记",
+        },
+      },
+      {
+        path: "knowledge",
+        component: () => import("@/components/Frontend/FrontendKnowledge.vue"),
+        meta: {
+          title: "知识库",
+        },
+      },
+    ],
+  },
+];
+
 const router = createRouter({
   history: createWebHistory(),
-  routes: managerRouter,
+  routes: [...managerRouter, ...frontendRouters],
 });
 
 // 路由守卫
