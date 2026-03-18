@@ -6,6 +6,23 @@
           AI 暖心相伴，<br />
           <span class="highlight-text">守护你的每一份情绪 </span>
         </h2>
+        <p class="description">
+          智能解忧，温柔相伴。AI
+          心理助手，为你提供安全、贴心、随时随地的情绪支持。
+        </p>
+        <div class="hero-actions">
+          <el-button size="large" @click="handleClick">
+            开始倾诉，获得陪伴
+          </el-button>
+          <el-button
+            size="large"
+            style="border-color: #fff"
+            color="transparent"
+            @click="handleClick"
+          >
+            记录心情，释放感情
+          </el-button>
+        </div>
       </div>
       <div class="robot">
         <el-image
@@ -69,7 +86,8 @@ const iconImg = new URL("@/assets/images/robot-fill.png", import.meta.url).href;
         rgba(255, 255, 255, 0.15) 0%,
         rgba(255, 255, 255, 0.05) 100%
       );
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1),
+      box-shadow:
+        0 15px 35px rgba(0, 0, 0, 0.1),
         inset 0 1px 0 rgba(255, 255, 255, 0.3);
     }
   }
