@@ -119,7 +119,11 @@ router.beforeEach((to, from, next) => {
         next("/manage/dashboard");
       }
     } else if (userInfo.userType === 1) {
-      next("/auth/login");
+      if (to.path.startsWith("/manage") || to.path.startsWith("/auth")) {
+        next("/");
+      } else {
+        next();
+      }
     }
   } else {
     if (to.path.startsWith("/manage")) {

@@ -44,7 +44,7 @@ export function uploadFile(
   file: File,
   businessInfo: {
     businessId: string;
-  }
+  },
 ): Promise<{
   filePath: string;
 }> {
@@ -89,14 +89,14 @@ export function getArticleDetail(id: string): Promise<KnowledgeArticleList> {
 
 export function updateArticle(
   id: string,
-  data: KnowledgeFormData
+  data: KnowledgeFormData,
 ): Promise<KnowledgeArticleList> {
   return service.put(`/knowledge/article/${id}`, data);
 }
 
 export function publishArticleStatus(
   id: string,
-  data: { status: string }
+  data: { status: string },
 ): Promise<KnowledgeArticleList> {
   return service.put(`/knowledge/article/${id}/status`, data);
 }
@@ -119,14 +119,14 @@ export function getConsultationPage(params: {
 }
 
 export function getSessionDetail(
-  sessionId: string
+  sessionId: string,
 ): Promise<SessionDialogDetail[]> {
   return service.get(`/psychological-chat/sessions/${sessionId}/messages`);
 }
 
 //情绪日志
 export function getEmotionalPage(
-  params: EmotionalQuery
+  params: EmotionalQuery,
 ): Promise<EmotionalResponse> {
   return service.get("/emotion-diary/admin/page", { params });
 }
@@ -143,6 +143,7 @@ export function getAnalyticsOverview(): Promise<AnalyticsOverviewResponse> {
   return service.get("/data-analytics/overview");
 }
 
+//退出登录
 export function logout() {
   return service.post("/user/logout");
 }

@@ -86,6 +86,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
         if (data.userInfo.userType === 2) {
           router.push("/manage/dashboard");
         } else {
+          router.push("/");
         }
       });
     }
