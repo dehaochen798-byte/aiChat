@@ -82,6 +82,7 @@
       </div>
       <!-- 聊天信息区域 -->
       <div class="chat-messages">
+        <!-- 没有数据的时候 -->
         <div v-if="message.length === 0" class="message-item ai-message">
           <div class="message-avatar">
             <el-image
@@ -97,6 +98,21 @@
               </p>
             </div>
             <div class="message-time">刚刚</div>
+          </div>
+        </div>
+        <!-- 消息列表 -->
+        <div
+          v-for="item in message"
+          :key="item.id"
+          class="message-item"
+          :class="item.senderType === 1 ? 'user-message' : 'ai-message'"
+        >
+          <div class="message-avatar">
+            <el-image
+              :src="item.senderType === 1 ? userImg : iconImg"
+              alt="message-icon"
+              style="width: 18px; height: 18px"
+            />
           </div>
         </div>
       </div>
@@ -126,12 +142,21 @@
 </template>
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { getSessionList, startSession } from "@/api/frontend";
+import {
+  deleteSession,
+  getSessionDetail,
+  getSessionList,
+  startSession,
+} from "@/api/frontend";
 import { ElMessage } from "element-plus";
-import type { frontendConsultationSessionListResponse } from "@/type/Frontend/Consultations";
+import type {
+  frontendConsultationDetailMessage,
+  frontendConsultationSessionListResponse,
+} from "@/type/Frontend/Consultations";
 
 const iconImg = new URL("@/assets/images/robot-fill.png", import.meta.url).href;
 const avatarImg = new URL("@/assets/images/like.png", import.meta.url).href;
+const userImg = new URL("@/assets/images/users.png", import.meta.url).href;
 
 interface Session {
   sessionId: string;
@@ -153,7 +178,7 @@ const currentSession = ref<Session | null>(null);
 const sessionList = ref<frontendConsultationSessionListResponse[]>([]);
 
 //定义对话消息
-const message = ref([]);
+const message = ref<frontendConsultationDetailMessage[]>([]);
 //用户输入的消息
 const userMessage = ref("");
 //是否正在输入中
@@ -162,6 +187,7 @@ const isAITyping = ref(false);
 //处理键盘事件
 const handleKeyDown = (e: { key: string }) => {
   if (e.key === "Enter") {
+    sendMessage();
   }
 };
 
@@ -227,10 +253,33 @@ const getSessionPage = async () => {
   });
 };
 
-//获取会话数据
-const handleSessionClick = (session: any) => {};
+//获取会话详细数据
+const handleSessionClick = async (
+  session: frontendConsultationSessionListResponse,
+) => {
+  const res = await getSessionDetail(session.id.toString());
+  if (res) {
+    message.value = res || [];
+  }
+};
+
 //删除会话
-const handleDeleteSession = (session: any) => {};
+const handleDeleteSession = async (
+  session: frontendConsultationSessionListResponse,
+) => {
+  await deleteSession(session.id.toString())
+    .then((res) => {
+      if (res) {
+        ElMessage.success("删除成功");
+        getSessionPage();
+      } else {
+        throw new Error("删除失败");
+      }
+    })
+    .catch((err) => {
+      ElMessage.error(err.message);
+    });
+};
 
 onMounted(() => {
   getSessionPage();

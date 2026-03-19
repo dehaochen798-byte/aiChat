@@ -18,3 +18,17 @@ export interface frontendConsultationSessionListResponse {
   startedAt: string;
   userId: number;
 }
+
+//详细数据
+export interface frontendConsultationDetailMessage {
+  content: string;
+  contentLength: number;
+  contentPreview: string;
+  createdAt: string;
+  id: number;
+  messageType: number;
+  messageTypeDesc: string;
+  senderType: number;
+  senderTypeDesc: string;
+  sessionId: number;
+}
