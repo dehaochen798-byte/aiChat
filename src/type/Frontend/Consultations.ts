@@ -7,3 +7,14 @@ export interface frontendConsultationSessionResponse {
   status: string;
   userHash: number;
 }
+
+export interface frontendConsultationSessionListResponse {
+  durationMinutes: number;
+  id: number;
+  lastMessageContent: string;
+  lastMessageTime: string;
+  messageCount: number;
+  sessionTitle: string;
+  startedAt: string;
+  userId: number;
+}

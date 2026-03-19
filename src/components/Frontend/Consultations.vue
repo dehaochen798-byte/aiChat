@@ -16,6 +16,49 @@
           在线服务中
         </div>
       </div>
+      <div class="session-history">
+        <h4 class="session-title">会话历史</h4>
+        <div class="session-list">
+          <div
+            v-for="session in sessionList"
+            :key="session.id"
+            class="session-item"
+            @click="handleSessionClick(session)"
+          >
+            <div class="session-info">
+              <div class="session-title">
+                <span>{{ session.sessionTitle }}</span>
+                <div class="session-meta">
+                  <span>{{ session.startedAt }}</span>
+                </div>
+                <div class="session-preview">
+                  <span>{{ session.lastMessageContent }}</span>
+                </div>
+                <div class="session-stats">
+                  <span>
+                    <el-icon><ChatRound /></el-icon>
+                    {{ session.messageCount || 0 }} 条消息
+                  </span>
+                  <span>
+                    <el-icon><Clock /></el-icon>
+                    {{ session.durationMinutes || 0 }} 分钟前
+                  </span>
+                </div>
+              </div>
+              <div class="session-actions">
+                <el-button
+                  text
+                  type="danger"
+                  size="small"
+                  @click="handleDeleteSession(session)"
+                >
+                  <el-icon><DeleteFilled /></el-icon>
+                </el-button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="chat-main">
       <div class="chat-header">
@@ -83,8 +126,9 @@
 </template>
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { startSession } from "@/api/frontend";
+import { getSessionList, startSession } from "@/api/frontend";
 import { ElMessage } from "element-plus";
+import type { frontendConsultationSessionListResponse } from "@/type/Frontend/Consultations";
 
 const iconImg = new URL("@/assets/images/robot-fill.png", import.meta.url).href;
 const avatarImg = new URL("@/assets/images/like.png", import.meta.url).href;
@@ -106,6 +150,7 @@ const createNewFrontendSession = () => {
 
 //当前会话信息
 const currentSession = ref<Session | null>(null);
+const sessionList = ref<frontendConsultationSessionListResponse[]>([]);
 
 //定义对话消息
 const message = ref([]);
@@ -155,6 +200,7 @@ const startNewSession = async (message: string) => {
     sessionParams.sessionTitle = currentSession.value?.sessionTitle || "";
   }
 
+  //创建新会话
   await startSession(sessionParams).then((res) => {
     const sessionData = {
       sessionId: res.sessionId,
@@ -170,7 +216,24 @@ const startNewSession = async (message: string) => {
   });
 };
 
+//更新会话列表
+const getSessionPage = async () => {
+  await getSessionList({
+    pageNum: "1",
+    pageSize: "10",
+  }).then((res) => {
+    sessionList.value = res.records || [];
+    // console.log(sessionList.value);
+  });
+};
+
+//获取会话数据
+const handleSessionClick = (session: any) => {};
+//删除会话
+const handleDeleteSession = (session: any) => {};
+
 onMounted(() => {
+  getSessionPage();
   createNewFrontendSession();
 });
 </script>
