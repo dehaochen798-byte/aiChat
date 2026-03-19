@@ -57,21 +57,122 @@
           </div>
         </div>
       </div>
+      <!-- 输入区域 -->
+      <div class="chat-input">
+        <div class="input-container">
+          <el-input
+            v-model="userMessage"
+            placeholder="请输入您想要分享的内容"
+            clearable
+            type="textarea"
+            :rows="3"
+            :disabled="isAITyping"
+            @keydown="handleKeyDown"
+            class="message-input"
+          />
+        </div>
+
+        <el-button type="primary" class="send-btn" @click="sendMessage">
+          <el-icon>
+            <Promotion />
+          </el-icon>
+        </el-button>
+      </div>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
+import { startSession } from "@/api/frontend";
+import { ElMessage } from "element-plus";
 
 const iconImg = new URL("@/assets/images/robot-fill.png", import.meta.url).href;
 const avatarImg = new URL("@/assets/images/like.png", import.meta.url).href;
 
+interface Session {
+  sessionId: string;
+  status: string;
+  sessionTitle: string;
+}
+
 const createNewFrontendSession = () => {
-  console.log("创建新会话");
+  const newSession = {
+    sessionId: `temp${Date.now()}`,
+    status: "TEMP",
+    sessionTitle: "新会话",
+  };
+  currentSession.value = newSession;
 };
+
+//当前会话信息
+const currentSession = ref<Session | null>(null);
 
 //定义对话消息
 const message = ref([]);
+//用户输入的消息
+const userMessage = ref("");
+//是否正在输入中
+const isAITyping = ref(false);
+
+//处理键盘事件
+const handleKeyDown = (e: { key: string }) => {
+  if (e.key === "Enter") {
+  }
+};
+
+//用户发送消息
+const sendMessage = async () => {
+  if (!userMessage.value.trim()) {
+    return;
+  }
+  if (isAITyping.value) {
+    ElMessage.error({
+      message: "AI正在处理中，请稍后再发送",
+    });
+    return;
+  }
+
+  const message = userMessage.value.trim();
+  userMessage.value = "";
+
+  //没有会话，临时会话，创建新会话
+  if (currentSession.value?.status === "TEMP") {
+    await startNewSession(message);
+  } else {
+    createNewFrontendSession();
+  }
+};
+
+const startNewSession = async (message: string) => {
+  const sessionParams = {
+    initialMessage: message,
+    sessionTitle: "",
+  };
+
+  if (currentSession.value?.sessionTitle === "新会话") {
+    sessionParams.sessionTitle = `ai助手-${new Date().toLocaleString()}`;
+  } else {
+    sessionParams.sessionTitle = currentSession.value?.sessionTitle || "";
+  }
+
+  await startSession(sessionParams).then((res) => {
+    const sessionData = {
+      sessionId: res.sessionId,
+      status: res.status,
+      sessionTitle: sessionParams.sessionTitle,
+    };
+    //如果现在是临时会话，要覆盖当前会话信息
+    if (currentSession.value && currentSession.value?.status === "TEMP") {
+      Object.assign(currentSession.value, sessionData);
+    } else {
+      currentSession.value = sessionData;
+    }
+  });
+};
+
+onMounted(() => {
+  createNewFrontendSession();
+});
 </script>
 <style scoped lang="scss">
 .consultation-container {
