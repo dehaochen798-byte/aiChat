@@ -114,6 +114,33 @@
               style="width: 18px; height: 18px"
             />
           </div>
+          <div class="message-content">
+            <div class="message-bubble">
+              <!-- ai 正在思考中 -->
+              <div
+                v-if="
+                  item.senderType === 2 && isAITyping === true && !item.content
+                "
+                class="typing-indicator"
+              >
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+              </div>
+              <!-- ai错误提示 -->
+
+              <!-- ai 正常消息 -->
+              <MarkdownRenderer
+                v-else-if="item.senderType === 2 && item.content"
+                :content="item.content"
+                :isAiMessage="true"
+              />
+              <p v-else v-html="formatMessageContent(item.content)"></p>
+            </div>
+            <div class="message-time">
+              {{ item.senderType === 1 ? item.createdAt : "正在输入" }}
+            </div>
+          </div>
         </div>
       </div>
       <!-- 输入区域 -->
@@ -150,9 +177,10 @@ import {
 } from "@/api/frontend";
 import { ElMessage } from "element-plus";
 import type {
-  frontendConsultationDetailMessage,
+  frontendConsultationDetailMessageAll,
   frontendConsultationSessionListResponse,
 } from "@/type/Frontend/Consultations";
+import MarkdownRenderer from "@/components/Frontend/MarkdownRenderer.vue";
 
 const iconImg = new URL("@/assets/images/robot-fill.png", import.meta.url).href;
 const avatarImg = new URL("@/assets/images/like.png", import.meta.url).href;
@@ -178,7 +206,7 @@ const currentSession = ref<Session | null>(null);
 const sessionList = ref<frontendConsultationSessionListResponse[]>([]);
 
 //定义对话消息
-const message = ref<frontendConsultationDetailMessage[]>([]);
+const message = ref<frontendConsultationDetailMessageAll[]>([]);
 //用户输入的消息
 const userMessage = ref("");
 //是否正在输入中
@@ -279,6 +307,10 @@ const handleDeleteSession = async (
     .catch((err) => {
       ElMessage.error(err.message);
     });
+};
+
+const formatMessageContent = (content: string) => {
+  return content.replace(/\n/g, "<br>");
 };
 
 onMounted(() => {

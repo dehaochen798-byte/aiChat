@@ -20,15 +20,16 @@ export interface frontendConsultationSessionListResponse {
 }
 
 //详细数据
-export interface frontendConsultationDetailMessage {
-  content: string;
-  contentLength: number;
-  contentPreview: string;
-  createdAt: string;
+export interface frontendConsultationDetailMessageAll {
   id: number;
-  messageType: number;
-  messageTypeDesc: string;
+  sessionId: number;
   senderType: number;
   senderTypeDesc: string;
-  sessionId: number;
+  messageType: number;
+  messageTypeDesc: string;
+  content: string;
+  aiModel?: string;
+  createdAt: string;
+  contentLength: number;
+  contentPreview: string;
 }

@@ -1,5 +1,5 @@
 import type {
-  frontendConsultationDetailMessage,
+  frontendConsultationDetailMessageAll,
   frontendConsultationSessionListResponse,
   frontendConsultationSessionResponse,
 } from "@/type/Frontend/Consultations";
@@ -36,6 +36,6 @@ export const deleteSession = (sessionId: string): Promise<boolean> => {
 // 获取会话详情
 export const getSessionDetail = (
   sessionId: string,
-): Promise<frontendConsultationDetailMessage[]> => {
+): Promise<frontendConsultationDetailMessageAll[]> => {
   return request.get(`/psychological-chat/sessions/${sessionId}/messages`);
 };
